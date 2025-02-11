@@ -15,4 +15,6 @@ fn main() {
         println!("{:#?}", args);
         println!("{:?}", wordsearch);
     }
+
+    wordsearch::search(&wordsearch);
 }
