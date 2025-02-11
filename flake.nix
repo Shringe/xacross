@@ -16,7 +16,10 @@
       {
         devShells.default = mkShell {
           buildInputs = with pkgs; [
+            rustc
             cargo
+            git
+            fish
           ];
 
           shellHook = ''
