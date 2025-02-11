@@ -11,6 +11,12 @@ pub struct WordSearch {
     cols: usize,
 }
 
+impl WordSearch {
+    pub fn get_coordinates(&self, point: usize) -> (usize, usize) {
+        (point / self.cols, point % self.cols)
+    }
+}
+
 pub fn read_wordsearch(file: &PathBuf) -> Result<String> {
     Ok(fs::read_to_string(file)?)
 }
@@ -36,6 +42,8 @@ pub fn parse_wordsearch(raw_wordsearch: &String) -> WordSearch {
             rows += 1;
             if cols == 0 {
                 cols = line.len()
+            } else if cols != line.len() {
+                panic!("The wordsearch grid must be a rectangle!")
             }
         }
     }
@@ -48,7 +56,9 @@ pub fn parse_wordsearch(raw_wordsearch: &String) -> WordSearch {
     }
 }
 
-pub fn generate_directions(wordsearch: &WordSearch, index: usize, row: usize, col: usize) -> Vec<usize> {
+pub fn generate_directions(wordsearch: &WordSearch, index: usize) -> Vec<usize> {
+    let (row, col) = wordsearch.get_coordinates(index);
+
     let width = wordsearch.cols;
     let height = wordsearch.rows;
 
@@ -81,10 +91,8 @@ pub fn generate_directions(wordsearch: &WordSearch, index: usize, row: usize, co
 
 pub fn search(wordsearch: &WordSearch) {
     for (i, letter) in wordsearch.grid.iter().enumerate() {
-        let row = i / wordsearch.cols;
-        let col = i % wordsearch.cols;
 
-        let directions = generate_directions(wordsearch,i, row, col);
+        let directions = generate_directions(wordsearch,i);
         println!("{:?}", directions);
         for direction in directions {
         }
