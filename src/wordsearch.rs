@@ -15,6 +15,39 @@ impl WordSearch {
     pub fn get_coordinates(&self, point: usize) -> (usize, usize) {
         (point / self.cols, point % self.cols)
     }
+
+    pub fn generate_directions(&self, index: usize) -> Vec<usize> {
+        let (row, col) = self.get_coordinates(index);
+
+        let width = self.cols;
+        let height = self.rows;
+
+        let is_first_row = row == 0;
+        let is_last_row = row == height - 1;
+        let is_first_col = col == 0;
+        let is_last_col = col == width - 1;
+
+        let mut points = Vec::<usize>::new();
+        if !is_first_row && !is_first_col { // NW
+            points.push(index - width - 1);
+        } if !is_first_row { // N
+            points.push(index - width);
+        } if !is_first_row && !is_last_col { // NE
+            points.push(index - width + 1);
+        } if !is_first_col { // W
+            points.push(index - 1);
+        } if !is_last_col { // E
+            points.push(index + 1)
+        } if !is_last_row && !is_first_col { // SW
+            points.push(index + width - 1)
+        } if !is_last_row { // S
+            points.push(index + width)
+        } if !is_last_row && !is_last_col { // SE
+            points.push(index + width + 1)
+        }
+
+        points
+    }
 }
 
 pub fn read_wordsearch(file: &PathBuf) -> Result<String> {
@@ -56,43 +89,11 @@ pub fn parse_wordsearch(raw_wordsearch: &String) -> WordSearch {
     }
 }
 
-pub fn generate_directions(wordsearch: &WordSearch, index: usize) -> Vec<usize> {
-    let (row, col) = wordsearch.get_coordinates(index);
-
-    let width = wordsearch.cols;
-    let height = wordsearch.rows;
-
-    let is_first_row = row == 0;
-    let is_last_row = row == height - 1;
-    let is_first_col = col == 0;
-    let is_last_col = col == width - 1;
-
-    let mut points = Vec::<usize>::new();
-    if !is_first_row && !is_first_col { // NW
-        points.push(index - width - 1);
-    } if !is_first_row { // N
-        points.push(index - width);
-    } if !is_first_row && !is_last_col { // NE
-        points.push(index - width + 1);
-    } if !is_first_col { // W
-        points.push(index - 1);
-    } if !is_last_col { // E
-        points.push(index + 1)
-    } if !is_last_row && !is_first_col { // SW
-        points.push(index + width - 1)
-    } if !is_last_row { // S
-        points.push(index + width)
-    } if !is_last_row && !is_last_col { // SE
-        points.push(index + width + 1)
-    }
-
-    points
-}
 
 pub fn search(wordsearch: &WordSearch) {
     for (i, letter) in wordsearch.grid.iter().enumerate() {
 
-        let directions = generate_directions(wordsearch,i);
+        let directions = wordsearch.generate_directions(i);
         println!("{:?}", directions);
         for direction in directions {
         }
