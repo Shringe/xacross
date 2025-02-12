@@ -75,13 +75,13 @@ impl WordSearch {
 
         let mut is_bank = false;
         for line in raw_wordsearch.to_lowercase().lines() {
-            if line == "" {
+            if line.trim().is_empty() {
                 is_bank = true;
-                continue
+                continue;
             }
 
             if is_bank {
-                bank.push(line.chars().collect());
+                bank.push(line.chars().filter(|c| !c.is_whitespace()).collect());
             } else {
                 grid.push(line.chars().collect());
             }
@@ -116,7 +116,10 @@ impl WordSearch {
             }
         }
 
-        println!("Total: {:?}", self.bank.len());
-        println!("Found: {:?}", found);
+        let total = self.bank.len();
+        println!("Wordsearch complete!");
+        println!("Total: {}", total);
+        println!("Found: {}", found);
+        println!("Missing: {}", total - found);
     }
 }
