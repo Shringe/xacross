@@ -1,101 +1,122 @@
-use std::fs;
-use std::path::PathBuf;
-use std::io::Result;
+use strum::IntoEnumIterator;
+use strum::EnumIter;
 
+
+#[derive(EnumIter)]
+pub enum Direction {
+    NorthWest,
+    North,
+    NorthEast,
+    West,
+    East,
+    SouthWest,
+    South,
+    SouthEast,
+}
+
+#[derive(Debug, Clone)]
+pub struct Point {
+    x: usize,
+    y: usize,
+}
+
+impl Point {
+    pub fn is_valid(&self, direction: &Direction, wordsearch: &WordSearch) -> bool {
+        match direction {
+            Direction::NorthWest => self.x != 0 && self.y != 0,
+            Direction::North => self.y != 0,
+            Direction::NorthEast => self.x != wordsearch.width - 1 && self.y != 0,
+            Direction::West => self.x != 0,
+            Direction::East => self.x != wordsearch.width - 1,
+            Direction::SouthWest => self.x != 0 && self.y != wordsearch.height - 1,
+            Direction::South => self.y != wordsearch.height - 1,
+            Direction::SouthEast => self.x != wordsearch.width - 1 && self.y != wordsearch.height - 1,
+        }
+    }
+
+    pub fn follow(&self, direction: &Direction) -> Point {
+        match direction {
+            Direction::NorthWest => Point { x: self.x - 1, y: self.y - 1 },
+            Direction::North => Point { x: self.x, y: self.y - 1 },
+            Direction::NorthEast => Point { x: self.x + 1, y: self.y - 1 },
+            Direction::West => Point { x: self.x - 1, y: self.y },
+            Direction::East => Point { x: self.x + 1, y: self.y },
+            Direction::SouthWest => Point { x: self.x - 1, y: self.y + 1 },
+            Direction::South => Point { x: self.x, y: self.y + 1 },
+            Direction::SouthEast => Point { x: self.x + 1, y: self.y + 1 },
+        }
+    }
+}
 
 #[derive(Debug)]
 pub struct WordSearch { 
-    grid: Vec<char>,
-    bank: Vec<String>,
-    rows: usize,
-    cols: usize,
+    grid: Vec<Vec<char>>,
+    bank: Vec<Vec<char>>,
+    width: usize,
+    height: usize,
 }
 
 impl WordSearch {
-    pub fn get_coordinates(&self, point: usize) -> (usize, usize) {
-        (point / self.cols, point % self.cols)
+    pub fn new(grid: Vec<Vec<char>>, bank: Vec<Vec<char>>) -> Self {
+        let width = grid.len();
+        let height = grid[0].len();
+
+        Self {
+            grid,
+            bank,
+            width,
+            height,
+        }
     }
 
-    pub fn generate_directions(&self, index: usize) -> Vec<usize> {
-        let (row, col) = self.get_coordinates(index);
+    pub fn parse(raw_wordsearch: &String) -> WordSearch {
+        let mut grid = Vec::new();
+        let mut bank = Vec::new();
 
-        let width = self.cols;
-        let height = self.rows;
+        let mut is_bank = false;
+        for line in raw_wordsearch.to_lowercase().lines() {
+            if line == "" {
+                is_bank = true;
+                continue
+            }
 
-        let is_first_row = row == 0;
-        let is_last_row = row == height - 1;
-        let is_first_col = col == 0;
-        let is_last_col = col == width - 1;
-
-        let mut points = Vec::<usize>::new();
-        if !is_first_row && !is_first_col { // NW
-            points.push(index - width - 1);
-        } if !is_first_row { // N
-            points.push(index - width);
-        } if !is_first_row && !is_last_col { // NE
-            points.push(index - width + 1);
-        } if !is_first_col { // W
-            points.push(index - 1);
-        } if !is_last_col { // E
-            points.push(index + 1)
-        } if !is_last_row && !is_first_col { // SW
-            points.push(index + width - 1)
-        } if !is_last_row { // S
-            points.push(index + width)
-        } if !is_last_row && !is_last_col { // SE
-            points.push(index + width + 1)
-        }
-
-        points
-    }
-}
-
-pub fn read_wordsearch(file: &PathBuf) -> Result<String> {
-    Ok(fs::read_to_string(file)?)
-}
-
-pub fn parse_wordsearch(raw_wordsearch: &String) -> WordSearch {
-    let mut grid = Vec::<char>::new();
-    let mut bank = Vec::<String>::new();
-    let mut rows = 0;
-    let mut cols = 0;
-
-    let mut is_bank = false;
-    for line in raw_wordsearch.lines() {
-        if line == "" {
-            is_bank = true;
-            continue
-        }
-
-        if is_bank {
-            bank.push(line.to_string());
-        } else {
-            grid.extend(line.chars().collect::<Vec<char>>());
-
-            rows += 1;
-            if cols == 0 {
-                cols = line.len()
-            } else if cols != line.len() {
-                panic!("The wordsearch grid must be a rectangle!")
+            if is_bank {
+                bank.push(line.chars().collect());
+            } else {
+                grid.push(line.chars().collect());
             }
         }
+
+        WordSearch::new(grid, bank)
     }
 
-    WordSearch {
-        grid,
-        bank,
-        rows,
-        cols,
-    }
-}
+    pub fn search(&self) {
+        let mut found: usize = 0;
 
+        for x in 0..self.width {
+            for y in 0..self.height {
+                let start = Point { x, y };
 
-pub fn search(wordsearch: &WordSearch) {
-    for (i, letter) in wordsearch.grid.iter().enumerate() {
+                for direction in Direction::iter() {
+                    let mut path = vec![self.grid[start.y][start.x]];
+                    let mut current = start.clone();
 
-        let directions = wordsearch.generate_directions(i);
-        println!("{:?}", directions);
-        for direction in directions {
+                    // Keep moving in the same direction until out of bounds
+                    while current.is_valid(&direction, self) {
+                        current = current.follow(&direction);
+                        path.push(self.grid[current.y][current.x]);
+
+                        // Check if we found a word
+                        if self.bank.contains(&path) {
+                            println!("Found word: {:?}", path.iter().collect::<String>());
+                            found += 1;
+                        } 
+                    }
+                }
+            }
         }
+
+        println!("Total: {:?}", self.bank.len());
+        println!("Found: {:?}", found);
     }
 }
