@@ -30,7 +30,7 @@ impl Solution {
 
         for word in &self.found {
             for point in &word.points {
-                let letter = grid_render[point.y][point.x].bright_blue().to_string();
+                let letter = grid_render[point.y][point.x].bright_blue().to_string().to_lowercase();
                 if color {
                     grid_render[point.y][point.x] = letter;
                 }
