@@ -146,7 +146,7 @@ impl WordSearch {
         let mut bank = Vec::new();
 
         let mut is_bank = false;
-        for line in raw_wordsearch.to_lowercase().lines() {
+        for line in raw_wordsearch.to_uppercase().lines() {
             if line.trim().is_empty() {
                 is_bank = true;
                 continue;
