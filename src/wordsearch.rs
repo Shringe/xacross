@@ -23,16 +23,34 @@ impl Solution {
     }
 
     pub fn render(&self, color: bool) -> String {
-        let mut grid_render: Vec<Vec<String>> = self.wordsearch.grid
-            .iter()
-            .map(|row| row.iter().map(|&c| c.to_string()).collect())
-            .collect();
+        let mut grid_render: Vec<Vec<String>> = Vec::new();
+        //grid_render.push(vec!["_ "..self.wordsearch.width)]);
+        //
+        //grid_render.push(self.wordsearch.grid.map());
+        let mut top_bar = Vec::new(); 
+        let mut top_spacer = Vec::new();
+        for x in 0..self.wordsearch.width {
+            top_bar.push(x.to_string());
+            top_spacer.push("_".to_string());
+        }
+        grid_render.push(top_bar);
+        grid_render.push(top_spacer);
+
+        for (index, row) in self.wordsearch.grid.iter().enumerate() {
+            let mut new_row: Vec<String> = Vec::new();
+            
+            for &c in row {
+                new_row.push(c.to_string());
+            }
+            
+            grid_render.push(new_row);
+        }
 
         for word in &self.found {
             for point in &word.points {
-                let letter = grid_render[point.y][point.x].bright_blue().to_string().to_lowercase();
+                let letter = grid_render[point.x][point.y].bright_blue().to_string().to_lowercase();
                 if color {
-                    grid_render[point.y][point.x] = letter;
+                    grid_render[point.x][point.y] = letter;
                 }
             }
         }
@@ -170,14 +188,14 @@ impl WordSearch {
                 let start = Point { x, y };
 
                 for direction in Direction::iter() {
-                    let mut cpath= vec![self.grid[start.y][start.x]];
+                    let mut cpath= vec![self.grid[start.x][start.y]];
                     let mut current = start.clone();
                     let mut ppath = vec![start.clone()];
 
                     // Keep moving in the same direction until out of bounds
                     while current.is_valid(&direction, self) {
                         current = current.follow(&direction);
-                        cpath.push(self.grid[current.y][current.x]);
+                        cpath.push(self.grid[current.x][current.y]);
                         ppath.push(current.clone());
 
                         // Check if we found a word
