@@ -24,6 +24,8 @@ impl Solution {
 
     pub fn render(&self, color: bool) -> String {
         let mut grid_render: Vec<Vec<String>> = Vec::new();
+
+        let horizontal_gap = self.wordsearch.width.to_string().len();
         //grid_render.push(vec!["_ "..self.wordsearch.width)]);
         //
         //grid_render.push(self.wordsearch.grid.map());
@@ -33,8 +35,8 @@ impl Solution {
             top_bar.push(x.to_string());
             top_spacer.push("_".to_string());
         }
-        grid_render.push(top_bar);
-        grid_render.push(top_spacer);
+        //grid_render.push(top_bar);
+        //grid_render.push(top_spacer);
 
         for (index, row) in self.wordsearch.grid.iter().enumerate() {
             let mut new_row: Vec<String> = Vec::new();
@@ -55,10 +57,20 @@ impl Solution {
             }
         }
 
-        let rendered_grid = grid_render.iter()
-            .map(|row| row.iter().join(" "))
-            .collect::<Vec<String>>()
-            .join("\n");
+        let prefix = "n |".to_string();
+        let mut rendered_grid = Vec::new();
+        for (index, row) in grid_render.iter().enumerate() {
+            //let prefix = format!("{:0>{}} |", index, horizontal_gap);
+let prefix = format!("{:0>width$} |", format!("{:0>width$}", index, width = horizontal_gap), width = horizontal_gap);
+            //let prefix = format!("{:0>{}} |", format!("{:0>{}}", index, horizontal_gap), horizontal_gap);
+            let row = row.iter().join(&" ".repeat(horizontal_gap));
+            rendered_grid.push(prefix + &row);
+        }
+        let rendered_grid = rendered_grid.join("\n");
+        //let rendered_grid = grid_render.iter()
+        //    .map(|row| prefix.clone() + &row.iter().join(&" ".repeat(horizontal_gap)))
+        //    .collect::<Vec<String>>()
+        //    .join("\n");
 
         let rendered_bank = format!("{}",
             self.found.iter().map(|w| format!("{}: {}", w.string.green(), w.points.iter().join(", ").yellow())).join("\n")
