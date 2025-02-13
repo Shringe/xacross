@@ -1,6 +1,72 @@
+use owo_colors::OwoColorize;
 use strum::IntoEnumIterator;
 use strum::EnumIter;
+use itertools::Itertools;
+use std::fmt;
 
+
+pub struct Solution {
+    wordsearch: WordSearch,
+
+    found: Vec<Word>,
+}
+
+impl Solution {
+    pub fn new(wordsearch: WordSearch, found: Vec<Word>) -> Self {
+        // let mut missing = total.clone();
+        // missing.retain(|w| !found.iter().any(|f| f.string == w.string));
+
+        Self {
+            wordsearch,
+            found,
+        }
+    }
+
+    pub fn render(&self, color: bool) -> String {
+        let mut grid_render: Vec<Vec<String>> = self.wordsearch.grid
+            .iter()
+            .map(|row| row.iter().map(|&c| c.to_string()).collect())
+            .collect();
+
+        for word in &self.found {
+            for point in &word.points {
+                let letter = grid_render[point.y][point.x].bright_blue().to_string();
+                if color {
+                    grid_render[point.y][point.x] = letter;
+                }
+            }
+        }
+
+        let rendered_grid = grid_render.iter()
+            .map(|row| row.iter().join(" "))
+            .collect::<Vec<String>>()
+            .join("\n");
+
+        let rendered_bank = format!("{}",
+            self.found.iter().map(|w| format!("{}: {}", w.string.green(), w.points.iter().join(", ").yellow())).join("\n")
+            // self.found.iter().map(|w| format!("{}: {} -> {}", w.string.green(), w.points[0], w.points[0]))
+        );
+        
+        // let rendered_bank = format!("{}\n{}",
+        //     self.found.iter().map(|w| w.string.green()).join("\n"),
+        //     self.missing.iter().map(|w| w.string.red()).join("\n")
+        // );
+
+        format!("
+Wordsearch: ==================================================
+{rendered_grid}
+
+Bank, top left = (0, 0): =====================================
+{rendered_bank}
+                ")
+    }
+}
+
+#[derive(Clone)]
+pub struct Word {
+    string: String,
+    points: Vec<Point>,
+}
 
 #[derive(EnumIter)]
 pub enum Direction {
@@ -18,6 +84,12 @@ pub enum Direction {
 pub struct Point {
     x: usize,
     y: usize,
+}
+
+impl fmt::Display for Point {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
+    }
 }
 
 impl Point {
@@ -48,7 +120,7 @@ impl Point {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WordSearch { 
     grid: Vec<Vec<char>>,
     bank: Vec<Vec<char>>,
@@ -90,36 +162,56 @@ impl WordSearch {
         WordSearch::new(grid, bank)
     }
 
-    pub fn search(&self) {
-        let mut found: usize = 0;
+    pub fn search(&self) -> Solution {
+        let mut found = Vec::new();
 
         for x in 0..self.width {
             for y in 0..self.height {
                 let start = Point { x, y };
 
                 for direction in Direction::iter() {
-                    let mut path = vec![self.grid[start.y][start.x]];
+                    let mut cpath= vec![self.grid[start.y][start.x]];
                     let mut current = start.clone();
+                    let mut ppath = vec![start.clone()];
 
                     // Keep moving in the same direction until out of bounds
                     while current.is_valid(&direction, self) {
                         current = current.follow(&direction);
-                        path.push(self.grid[current.y][current.x]);
+                        cpath.push(self.grid[current.y][current.x]);
+                        ppath.push(current.clone());
 
                         // Check if we found a word
-                        if self.bank.contains(&path) {
-                            println!("Found word: {:?}", path.iter().collect::<String>());
-                            found += 1;
+                        if self.bank.contains(&cpath) {
+                            found.push( Word {
+                                string: cpath.iter().collect::<String>(),
+                                points: ppath.clone(),
+                            })
                         } 
                     }
                 }
             }
         }
 
-        let total = self.bank.len();
-        println!("Wordsearch complete!");
-        println!("Total: {}", total);
-        println!("Found: {}", found);
-        println!("Missing: {}", total - found);
+        Solution::new(self.clone(), found)
+    }
+
+    pub fn render(&self) -> String {
+        let rendered_grid = self.grid.iter()
+            .map(|row| row.iter().join(" "))
+            .collect::<Vec<String>>()
+            .join("\n");
+        
+        let rendered_bank = self.bank.iter()
+            .map(|row| row.iter().collect::<String>())
+            .collect::<Vec<String>>()
+            .join("\n");
+
+        format!("
+Wordsearch: ==================================================
+{rendered_grid}
+
+Bank: ========================================================
+{rendered_bank}
+                ")
     }
 }
