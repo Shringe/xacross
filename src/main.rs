@@ -5,7 +5,6 @@ mod solution;
 use clap::Parser;
 use wordsearch::WordSearch;
 use std::fs::read_to_string;
-use owo_colors::OwoColorize;
 
 
 fn main() {
