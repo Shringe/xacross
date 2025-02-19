@@ -33,10 +33,11 @@ impl Solution {
         let mut top_spacer = Vec::new();
         for x in 0..self.wordsearch.width {
             top_bar.push(x.to_string());
-            top_spacer.push("_".to_string());
+            top_spacer.push("_".to_string().repeat(horizontal_gap + 2));
         }
         //grid_render.push(top_bar);
         //grid_render.push(top_spacer);
+        let top_spacer = "_".to_string().repeat(self.wordsearch.width * (horizontal_gap + 1));
 
         for (index, row) in self.wordsearch.grid.iter().enumerate() {
             let mut new_row: Vec<String> = Vec::new();
@@ -84,6 +85,7 @@ let prefix = format!("{:0>width$} |", format!("{:0>width$}", index, width = hori
 
         format!("
 Wordsearch: ==================================================
+{top_spacer}
 {rendered_grid}
 
 Bank, top left = (0, 0): =====================================
