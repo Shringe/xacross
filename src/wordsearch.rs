@@ -22,7 +22,7 @@ impl Solution {
         }
     }
 
-    pub fn render(&self, color: bool) -> String {
+    pub fn render_grid(&self) -> String {
         let mut grid_render: Vec<Vec<String>> = Vec::new();
 
         let horizontal_gap = self.wordsearch.width.to_string().len();
@@ -49,6 +49,7 @@ impl Solution {
             grid_render.push(new_row);
         }
 
+        let color = true;
         for word in &self.found {
             for point in &word.points {
                 let letter = grid_render[point.x][point.y].bright_blue().to_string().to_lowercase();
@@ -62,16 +63,21 @@ impl Solution {
         let mut rendered_grid = Vec::new();
         for (index, row) in grid_render.iter().enumerate() {
             //let prefix = format!("{:0>{}} |", index, horizontal_gap);
-let prefix = format!("{:0>width$} |", format!("{:0>width$}", index, width = horizontal_gap), width = horizontal_gap);
+            let prefix = format!("{:0>width$} |", format!("{:0>width$}", index, width = horizontal_gap), width = horizontal_gap);
             //let prefix = format!("{:0>{}} |", format!("{:0>{}}", index, horizontal_gap), horizontal_gap);
             let row = row.iter().join(&" ".repeat(horizontal_gap));
             rendered_grid.push(prefix + &row);
         }
-        let rendered_grid = rendered_grid.join("\n");
+        rendered_grid.join("\n")
         //let rendered_grid = grid_render.iter()
         //    .map(|row| prefix.clone() + &row.iter().join(&" ".repeat(horizontal_gap)))
         //    .collect::<Vec<String>>()
         //    .join("\n");
+
+    }
+
+    pub fn render(&self) -> String {
+        let rendered_grid = self.render_grid();
 
         let rendered_bank = format!("{}",
             self.found.iter().map(|w| format!("{}: {}", w.string.green(), w.points.iter().join(", ").yellow())).join("\n")
@@ -85,7 +91,6 @@ let prefix = format!("{:0>width$} |", format!("{:0>width$}", index, width = hori
 
         format!("
 Wordsearch: ==================================================
-{top_spacer}
 {rendered_grid}
 
 Bank, top left = (0, 0): =====================================
