@@ -76,18 +76,13 @@ impl Solution {
 
     }
 
+    pub fn render_bank(&self) -> String {
+        format!("{}", self.found.iter().map(|w| format!("{}: {}", w.string.green(), w.points.iter().join(", ").yellow())).join("\n"))
+    }
+
     pub fn render(&self) -> String {
         let rendered_grid = self.render_grid();
-
-        let rendered_bank = format!("{}",
-            self.found.iter().map(|w| format!("{}: {}", w.string.green(), w.points.iter().join(", ").yellow())).join("\n")
-            // self.found.iter().map(|w| format!("{}: {} -> {}", w.string.green(), w.points[0], w.points[0]))
-        );
-        
-        // let rendered_bank = format!("{}\n{}",
-        //     self.found.iter().map(|w| w.string.green()).join("\n"),
-        //     self.missing.iter().map(|w| w.string.red()).join("\n")
-        // );
+        let rendered_bank = self.render_bank();
 
         format!("
 Wordsearch: ==================================================
