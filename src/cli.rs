@@ -4,40 +4,29 @@ use clap::Command;
 use clap::Subcommand;
 use std::path::PathBuf;
 
-/// Simple program to greet a person
 #[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
-#[command(propagate_version = true)]
 pub struct Cli {
     /// File to solve
     #[arg(short, long)]
     pub file: PathBuf,
 
-    /// Render solved grid
-    #[command(subcommand)]
-    pub commands: Commands,
-
     /// Extra debug information
     #[arg(short, long, default_value_t = false)]
     pub debug: bool,
-}
 
-#[derive(Subcommand, Debug)]
-pub enum Commands {
-    RenderOptions(RenderOptions),
-}
+    /// Skip rendering unsolved grid
+    #[arg(long, default_value_t = false)]
+    pub no_raw_grid: bool,
 
-#[derive(Args, Debug)]
-pub struct RenderOptions {
-    /// Renders raw
-    pub raw: Option<bool>,
+    /// Skip rendering unsolved bank
+    #[arg(long, default_value_t = false)]
+    pub no_raw_bank: bool,
 
-    /// Renders the grid
-    pub grid: Option<bool>,
-    
-    /// Renders the word bank
-    pub bank: Option<bool>,
+    /// Skip rendering solved grid
+    #[arg(long, default_value_t = false)]
+    pub no_grid: bool,
 
-    /// renders all
-    pub complete: Option<bool>,
+    /// Skip rendering solved bank
+    #[arg(long, default_value_t = false)]
+    pub no_bank: bool,
 }

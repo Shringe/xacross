@@ -16,20 +16,15 @@ fn main() {
 
     let raw_wordsearch = read_to_string(&args.file).expect("Could not read file");
     let wordsearch = WordSearch::parse(&raw_wordsearch);
-
-    if args.debug {
-        //println!("{:?}", wordsearch);
-        println!("{:?}", args.commands);
-    }
-
-    match &args.commands {
-        cli::Commands::RenderOptions(options) => {
-            println!("'myapp add' was used, name is: {:?}", options.raw);
-        }
-    }
-
-    //println!("{}", wordsearch.render());
-    //println!("Solving wordsearch...");
     let solved = wordsearch.search();
-    //println!("{}", solved.render());
+
+    if !args.no_raw_grid {
+        println!("{}", wordsearch.render());
+    } if !args.no_raw_bank {
+
+    } if !args.no_grid {
+        println!("{}", solved.render_grid());
+    } if !args.no_bank {
+        println!("{}", solved.render_bank());
+    }
 }
