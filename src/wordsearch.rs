@@ -62,35 +62,31 @@ impl Solution {
         let prefix = "n |".to_string();
         let mut rendered_grid = Vec::new();
         for (index, row) in grid_render.iter().enumerate() {
-            //let prefix = format!("{:0>{}} |", index, horizontal_gap);
             let prefix = format!("{:0>width$} |", format!("{:0>width$}", index, width = horizontal_gap), width = horizontal_gap);
-            //let prefix = format!("{:0>{}} |", format!("{:0>{}}", index, horizontal_gap), horizontal_gap);
             let row = row.iter().join(&" ".repeat(horizontal_gap));
             rendered_grid.push(prefix + &row);
         }
         rendered_grid.join("\n")
-        //let rendered_grid = grid_render.iter()
-        //    .map(|row| prefix.clone() + &row.iter().join(&" ".repeat(horizontal_gap)))
-        //    .collect::<Vec<String>>()
-        //    .join("\n");
-
     }
 
     pub fn render_bank(&self) -> String {
         format!("{}", self.found.iter().map(|w| format!("{}: {}", w.string.green(), w.points.iter().join(", ").yellow())).join("\n"))
     }
 
-    pub fn render(&self) -> String {
-        let rendered_grid = self.render_grid();
-        let rendered_bank = self.render_bank();
+    pub fn render(&self, grid: bool, bank: bool) -> String {
+        let mut final_render = String::new();
 
-        format!("
-Wordsearch: ==================================================
-{rendered_grid}
+        if grid {
+            let prefix = "Wordsearch: ==================================================";
+            let rendered_grid = format!("{prefix}\n{}", self.render_grid());
+            final_render.push_str(&rendered_grid);
+        } if bank {
+            let prefix = "Bank, top left = (0, 0): =====================================";
+            let rendered_bank = format!("{prefix}\n{}", self.render_bank());
+            final_render.push_str(&rendered_bank);
+        }
 
-Bank, top left = (0, 0): =====================================
-{rendered_bank}
-                ")
+        final_render
     }
 }
 
