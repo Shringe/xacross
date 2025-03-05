@@ -18,13 +18,18 @@ fn main() {
     let wordsearch = WordSearch::parse(&raw_wordsearch);
     let solved = wordsearch.search();
 
-    if !args.no_raw_grid {
-        println!("{}", wordsearch.render());
-    } if !args.no_raw_bank {
+    println!("{}", solved.render(
+            !args.no_grid,
+            !args.no_bank
+            ));
 
-    } if !args.no_grid {
-        println!("{}", solved.render_grid());
-    } if !args.no_bank {
-        println!("{}", solved.render_bank());
-    }
+    //if !args.no_raw_grid {
+    //    println!("{}", wordsearch.render());
+    //} if !args.no_raw_bank {
+    //
+    //} if !args.no_grid {
+    //    println!("{}", solved.render_grid());
+    //} if !args.no_bank {
+    //    println!("{}", solved.render_bank());
+    //}
 }
