@@ -3,6 +3,7 @@ use strum::IntoEnumIterator;
 use strum::EnumIter;
 use itertools::Itertools;
 use std::fmt;
+use std::string::ToString;
 
 
 pub struct Solution {
@@ -73,20 +74,34 @@ impl Solution {
         format!("{}", self.found.iter().map(|w| format!("{}: {}", w.string.green(), w.points.iter().join(", ").yellow())).join("\n"))
     }
 
-    pub fn render(&self, grid: bool, bank: bool) -> String {
+    pub fn render(&self, grid: bool, bank: bool, header_length: usize) -> String {
         let mut final_render = String::new();
 
         if grid {
-            let prefix = "Wordsearch: ==================================================";
+            let prefix = Solution::fill_header("Wordsearch: ", '=', header_length);
             let rendered_grid = format!("{prefix}\n{}", self.render_grid());
             final_render.push_str(&rendered_grid);
         } if bank {
-            let prefix = "Bank, top left = (0, 0): =====================================";
+            let prefix = Solution::fill_header("\n\nBank, top left = (0, 0): ", '=', header_length);
             let rendered_bank = format!("{prefix}\n{}", self.render_bank());
             final_render.push_str(&rendered_bank);
         }
 
         final_render
+    }
+
+    pub fn fill_header<S: Into<String>>(header: S, spacer: char, length: usize) -> String {
+        let header = header.into();
+        let header_length = header.len();
+
+        if length <= header_length {
+            println!("{} || {}", length, header_length);
+            header
+        } else {
+            let spacer_length = length - header_length;
+            let spacer = spacer.to_string().repeat(spacer_length);
+            format!("{}{}", header, spacer)
+        }
     }
 }
 

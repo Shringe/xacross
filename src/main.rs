@@ -20,8 +20,9 @@ fn main() {
 
     println!("{}", solved.render(
             !args.no_grid,
-            !args.no_bank
-            ));
+            !args.no_bank,
+            100
+        ));
 
     //if !args.no_raw_grid {
     //    println!("{}", wordsearch.render());
