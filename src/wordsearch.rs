@@ -26,19 +26,9 @@ impl Solution {
     pub fn render_grid(&self) -> String {
         let mut grid_render: Vec<Vec<String>> = Vec::new();
 
+
         let horizontal_gap = self.wordsearch.width.to_string().len();
-        //grid_render.push(vec!["_ "..self.wordsearch.width)]);
-        //
-        //grid_render.push(self.wordsearch.grid.map());
-        let mut top_bar = Vec::new(); 
-        let mut top_spacer = Vec::new();
-        for x in 0..self.wordsearch.width {
-            top_bar.push(x.to_string());
-            top_spacer.push("_".to_string().repeat(horizontal_gap + 2));
-        }
-        //grid_render.push(top_bar);
-        //grid_render.push(top_spacer);
-        let top_spacer = "_".to_string().repeat(self.wordsearch.width * (horizontal_gap + 1));
+
 
         for (index, row) in self.wordsearch.grid.iter().enumerate() {
             let mut new_row: Vec<String> = Vec::new();
@@ -62,12 +52,25 @@ impl Solution {
 
         let prefix = "n |".to_string();
         let mut rendered_grid = Vec::new();
+        let mut final_width = self.wordsearch.width;
+        let mut has_width = false;
         for (index, row) in grid_render.iter().enumerate() {
             let prefix = format!("{:0>width$} |", format!("{:0>width$}", index, width = horizontal_gap), width = horizontal_gap);
             let row = row.iter().join(&" ".repeat(horizontal_gap));
-            rendered_grid.push(prefix + &row);
+
+            let full_row = prefix + &row;
+            if !has_width {
+                final_width = full_row.len();
+                has_width = true;
+            }
+            // println!("{}", full_row); 
+            // println!("{}", final_width);
+
+            rendered_grid.push(full_row);
         }
-        rendered_grid.join("\n")
+
+        let top_bar = Solution::fill_header("",'_', final_width);
+        format!("{}\n{}", top_bar, rendered_grid.join("\n"))
     }
 
     pub fn render_bank(&self) -> String {

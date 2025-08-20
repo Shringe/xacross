@@ -23,14 +23,4 @@ fn main() {
             !args.no_bank,
             100
         ));
-
-    //if !args.no_raw_grid {
-    //    println!("{}", wordsearch.render());
-    //} if !args.no_raw_bank {
-    //
-    //} if !args.no_grid {
-    //    println!("{}", solved.render_grid());
-    //} if !args.no_bank {
-    //    println!("{}", solved.render_bank());
-    //}
 }
