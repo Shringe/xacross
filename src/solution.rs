@@ -10,7 +10,8 @@ pub struct Solution {
 }
 
 impl Solution {
-    pub fn new(wordsearch: WordSearch, found: Vec<Word>) -> Self {
+    pub fn new(wordsearch: WordSearch, mut found: Vec<Word>) -> Self {
+        found.sort_by(|a, b| a.string.cmp(&b.string));
         Self {
             wordsearch,
             found,
