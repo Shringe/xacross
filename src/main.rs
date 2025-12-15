@@ -19,8 +19,7 @@ fn main() {
         println!("{:?}", wordsearch);
     }
 
-    println!("{}", wordsearch.render());
     println!("Solving wordsearch...");
     let solved = wordsearch.search();
-    println!("{}", solved.render(true));
+    println!("{}", solved.render());
 }

@@ -1,101 +1,15 @@
-use owo_colors::OwoColorize;
 use strum::IntoEnumIterator;
 use strum::EnumIter;
-use itertools::Itertools;
 use std::fmt;
 
+use crate::solution::Solution;
 
-pub struct Solution {
-    wordsearch: WordSearch,
 
-    found: Vec<Word>,
-}
-
-impl Solution {
-    pub fn new(wordsearch: WordSearch, found: Vec<Word>) -> Self {
-        // let mut missing = total.clone();
-        // missing.retain(|w| !found.iter().any(|f| f.string == w.string));
-
-        Self {
-            wordsearch,
-            found,
-        }
-    }
-
-    pub fn render(&self, color: bool) -> String {
-        let mut grid_render: Vec<Vec<String>> = Vec::new();
-
-        let horizontal_gap = self.wordsearch.width.to_string().len();
-        //grid_render.push(vec!["_ "..self.wordsearch.width)]);
-        //
-        //grid_render.push(self.wordsearch.grid.map());
-        let mut top_bar = Vec::new(); 
-        let mut top_spacer = Vec::new();
-        for x in 0..self.wordsearch.width {
-            top_bar.push(x.to_string());
-            top_spacer.push("_".to_string());
-        }
-        //grid_render.push(top_bar);
-        //grid_render.push(top_spacer);
-
-        for (index, row) in self.wordsearch.grid.iter().enumerate() {
-            let mut new_row: Vec<String> = Vec::new();
-            
-            for &c in row {
-                new_row.push(c.to_string());
-            }
-            
-            grid_render.push(new_row);
-        }
-
-        for word in &self.found {
-            for point in &word.points {
-                let letter = grid_render[point.x][point.y].bright_blue().to_string().to_lowercase();
-                if color {
-                    grid_render[point.x][point.y] = letter;
-                }
-            }
-        }
-
-        let prefix = "n |".to_string();
-        let mut rendered_grid = Vec::new();
-        for (index, row) in grid_render.iter().enumerate() {
-            //let prefix = format!("{:0>{}} |", index, horizontal_gap);
-let prefix = format!("{:0>width$} |", format!("{:0>width$}", index, width = horizontal_gap), width = horizontal_gap);
-            //let prefix = format!("{:0>{}} |", format!("{:0>{}}", index, horizontal_gap), horizontal_gap);
-            let row = row.iter().join(&" ".repeat(horizontal_gap));
-            rendered_grid.push(prefix + &row);
-        }
-        let rendered_grid = rendered_grid.join("\n");
-        //let rendered_grid = grid_render.iter()
-        //    .map(|row| prefix.clone() + &row.iter().join(&" ".repeat(horizontal_gap)))
-        //    .collect::<Vec<String>>()
-        //    .join("\n");
-
-        let rendered_bank = format!("{}",
-            self.found.iter().map(|w| format!("{}: {}", w.string.green(), w.points.iter().join(", ").yellow())).join("\n")
-            // self.found.iter().map(|w| format!("{}: {} -> {}", w.string.green(), w.points[0], w.points[0]))
-        );
-        
-        // let rendered_bank = format!("{}\n{}",
-        //     self.found.iter().map(|w| w.string.green()).join("\n"),
-        //     self.missing.iter().map(|w| w.string.red()).join("\n")
-        // );
-
-        format!("
-Wordsearch: ==================================================
-{rendered_grid}
-
-Bank, top left = (0, 0): =====================================
-{rendered_bank}
-                ")
-    }
-}
 
 #[derive(Clone)]
 pub struct Word {
-    string: String,
-    points: Vec<Point>,
+    pub string: String,
+    pub points: Vec<Point>,
 }
 
 #[derive(EnumIter)]
@@ -112,8 +26,8 @@ pub enum Direction {
 
 #[derive(Debug, Clone)]
 pub struct Point {
-    x: usize,
-    y: usize,
+    pub x: usize,
+    pub y: usize,
 }
 
 impl fmt::Display for Point {
@@ -152,10 +66,10 @@ impl Point {
 
 #[derive(Debug, Clone)]
 pub struct WordSearch { 
-    grid: Vec<Vec<char>>,
-    bank: Vec<Vec<char>>,
-    width: usize,
-    height: usize,
+    pub grid: Vec<Vec<char>>,
+    pub bank: Vec<Vec<char>>,
+    pub width: usize,
+    pub height: usize,
 }
 
 impl WordSearch {
@@ -223,25 +137,5 @@ impl WordSearch {
         }
 
         Solution::new(self.clone(), found)
-    }
-
-    pub fn render(&self) -> String {
-        let rendered_grid = self.grid.iter()
-            .map(|row| row.iter().join(" "))
-            .collect::<Vec<String>>()
-            .join("\n");
-        
-        let rendered_bank = self.bank.iter()
-            .map(|row| row.iter().collect::<String>())
-            .collect::<Vec<String>>()
-            .join("\n");
-
-        format!("
-Wordsearch: ==================================================
-{rendered_grid}
-
-Bank: ========================================================
-{rendered_bank}
-                ")
     }
 }
