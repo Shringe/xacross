@@ -1,3 +1,6 @@
+use owo_colors::DynColors;
+use owo_colors::Rgb;
+use rand::Rng;
 use strum::IntoEnumIterator;
 use strum::EnumIter;
 use std::fmt;
@@ -5,11 +8,28 @@ use std::fmt;
 use crate::solution::Solution;
 
 
-
 #[derive(Clone)]
 pub struct Word {
     pub string: String,
     pub points: Vec<Point>,
+    pub color: Rgb,
+}
+
+impl Word {
+    pub fn new(string: String, points: Vec<Point>) -> Self {
+        let mut rng = rand::rng();
+        let color = Rgb(
+            rng.random_range(0..=255),
+            rng.random_range(0..=255),
+            rng.random_range(0..=255),
+        );
+
+        Self {
+            string,
+            points,
+            color,
+        }
+    }
 }
 
 #[derive(EnumIter)]
@@ -24,7 +44,7 @@ pub enum Direction {
     SouthEast,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct Point {
     pub x: usize,
     pub y: usize,
@@ -126,10 +146,10 @@ impl WordSearch {
 
                         // Check if we found a word
                         if self.bank.contains(&cpath) {
-                            found.push( Word {
-                                string: cpath.iter().collect::<String>(),
-                                points: ppath.clone(),
-                            })
+                            found.push(Word::new(
+                                cpath.iter().collect::<String>(),
+                                ppath.clone(),
+                            ));
                         } 
                     }
                 }

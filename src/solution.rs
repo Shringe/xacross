@@ -1,8 +1,20 @@
+use std::collections::HashMap;
+
 use itertools::Itertools;
-use owo_colors::OwoColorize;
+use owo_colors::{OwoColorize, Rgb};
 
 use crate::wordsearch::{Word, WordSearch};
 
+
+/// Blends two rgb colors together
+fn blend_colors(a: Rgb, b: Rgb) -> Rgb {
+    // converting to u16 to prevent overflow
+    Rgb(
+        ((a.0 as u16 + b.0 as u16) / 2) as u8,
+        ((a.1 as u16 + b.1 as u16) / 2) as u8,
+        ((a.2 as u16 + b.2 as u16) / 2) as u8
+    )
+}
 
 pub struct Solution {
     wordsearch: WordSearch,
@@ -56,10 +68,27 @@ impl Solution {
         }
 
         // Highlighting
+        let mut color_map = HashMap::new();
+
         for word in &self.found {
             for point in &word.points {
-                let letter = grid_render[point.x][point.y].bright_blue().to_string().to_lowercase();
-                grid_render[point.x][point.y] = letter;
+                let (color, overlapping) = match color_map.get(&point) {
+                    Some(previous_color) => {
+                        let blend = blend_colors(*previous_color, word.color);
+                        (blend, true)
+                    },
+                    None => (word.color, false),
+                };
+
+                let letter = grid_render[point.x][point.y].clone();
+                let highlighted = if overlapping {
+                    letter.color(color).bold().to_string()
+                } else {
+                    letter.color(color).to_string()
+                }.to_lowercase();
+
+                color_map.insert(point, color);
+                grid_render[point.x][point.y] = highlighted;
             }
         }
 
