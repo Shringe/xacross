@@ -150,15 +150,23 @@ impl Solution {
         rows.join("\n")
     }
 
+    /// Formats a simple divider used for the final solution display
+    fn format_divider(title: &str) -> String {
+        // TODO: extrapolate some of the math from the top spacer into Self, so that the
+        // final_width can be reused to compute trailing len
+        let spacer = ": ";
+        let trailing = "=".repeat(50);
+        format!("{}{}{}", title, spacer, trailing)
+    }
+
     /// Formats a final solution screen from a rendered bank and grid
     fn format_render(grid: String, bank: String) -> String {
         format!(
-            "Wordsearch: ==================================================
-{}
-
-Bank, top left = (0, 0): =====================================
-{}",
-            grid, bank
+            "{}\n{}\n\n{}\n{}",
+            Self::format_divider("Wordsearch"),
+            grid,
+            Self::format_divider("Bank"),
+            bank
         )
     }
 
