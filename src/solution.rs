@@ -5,14 +5,13 @@ use owo_colors::{OwoColorize, Rgb};
 
 use crate::wordsearch::{Word, WordSearch};
 
-
 /// Blends two rgb colors together
 fn blend_colors(a: Rgb, b: Rgb) -> Rgb {
     // converting to u16 to prevent overflow
     Rgb(
         ((a.0 as u16 + b.0 as u16) / 2) as u8,
         ((a.1 as u16 + b.1 as u16) / 2) as u8,
-        ((a.2 as u16 + b.2 as u16) / 2) as u8
+        ((a.2 as u16 + b.2 as u16) / 2) as u8,
     )
 }
 
@@ -24,15 +23,12 @@ pub struct Solution {
 impl Solution {
     pub fn new(wordsearch: WordSearch, mut found: Vec<Word>) -> Self {
         found.sort_by(|a, b| a.string.cmp(&b.string));
-        Self {
-            wordsearch,
-            found,
-        }
+        Self { wordsearch, found }
     }
 
     /// Renders the word bank
     fn render_bank(&self) -> String {
-        let mut longest_word_length = 0; 
+        let mut longest_word_length = 0;
         for w in self.found.iter() {
             let len = w.string.len();
             if len > longest_word_length {
@@ -40,7 +36,7 @@ impl Solution {
             }
         }
 
-        let longest_word_length  = longest_word_length + 2;
+        let longest_word_length = longest_word_length + 2;
 
         let mut entries = self.found.iter().map(|w| {
             let padding_width = longest_word_length - w.string.len();
@@ -59,11 +55,11 @@ impl Solution {
         // Converting the chars to strings for coloring
         for row in self.wordsearch.grid.iter() {
             let mut new_row: Vec<String> = Vec::new();
-            
+
             for &c in row {
                 new_row.push(c.to_string());
             }
-            
+
             grid_render.push(new_row);
         }
 
@@ -76,7 +72,7 @@ impl Solution {
                     Some(previous_color) => {
                         let blend = blend_colors(*previous_color, word.color);
                         (blend, true)
-                    },
+                    }
                     None => (word.color, false),
                 };
 
@@ -85,7 +81,8 @@ impl Solution {
                     letter.color(color).bold().to_string()
                 } else {
                     letter.color(color).to_string()
-                }.to_lowercase();
+                }
+                .to_lowercase();
 
                 color_map.insert(point, color);
                 grid_render[point.x][point.y] = highlighted;
@@ -120,15 +117,21 @@ impl Solution {
 
     /// Formats a final solution screen from a rendered bank and grid
     fn format_render(grid: String, bank: String) -> String {
-        format!("Wordsearch: ==================================================
+        format!(
+            "Wordsearch: ==================================================
 {}
 
 Bank, top left = (0, 0): =====================================
-{}", grid, bank)
+{}",
+            grid, bank
+        )
     }
 
     /// Renders a bank and grid, and then formats them to be displayed
     pub fn render(&self) -> String {
-        Self::format_render(Self::add_guides(&self, self.render_grid()), self.render_bank())
+        Self::format_render(
+            Self::add_guides(&self, self.render_grid()),
+            self.render_bank(),
+        )
     }
 }

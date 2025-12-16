@@ -1,21 +1,22 @@
 use owo_colors::Rgb;
 use rand::Rng;
-use strum::IntoEnumIterator;
-use strum::EnumIter;
 use std::fmt;
+use std::fmt::write;
+use strum::EnumIter;
+use strum::IntoEnumIterator;
 
 use crate::solution::Solution;
-
 
 #[derive(Clone)]
 pub struct Word {
     pub string: String,
     pub points: Vec<Point>,
     pub color: Rgb,
+    pub direction: Direction,
 }
 
 impl Word {
-    pub fn new(string: String, points: Vec<Point>) -> Self {
+    pub fn new(string: String, points: Vec<Point>, direction: Direction) -> Self {
         let mut rng = rand::rng();
         let color = Rgb(
             rng.random_range(0..=255),
@@ -27,11 +28,12 @@ impl Word {
             string,
             points,
             color,
+            direction,
         }
     }
 }
 
-#[derive(EnumIter)]
+#[derive(Clone, Copy, EnumIter)]
 pub enum Direction {
     NorthWest,
     North,
@@ -41,6 +43,25 @@ pub enum Direction {
     SouthWest,
     South,
     SouthEast,
+}
+
+impl fmt::Display for Direction {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Direction::NorthWest => "↖",
+                Direction::North => "⬆",
+                Direction::NorthEast => "↗",
+                Direction::West => "⬅",
+                Direction::East => "➡",
+                Direction::SouthWest => "↙",
+                Direction::South => "⬇",
+                Direction::SouthEast => "↘",
+            }
+        )
+    }
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -65,26 +86,52 @@ impl Point {
             Direction::East => self.x != wordsearch.width - 1,
             Direction::SouthWest => self.x != 0 && self.y != wordsearch.height - 1,
             Direction::South => self.y != wordsearch.height - 1,
-            Direction::SouthEast => self.x != wordsearch.width - 1 && self.y != wordsearch.height - 1,
+            Direction::SouthEast => {
+                self.x != wordsearch.width - 1 && self.y != wordsearch.height - 1
+            }
         }
     }
 
     pub fn follow(&self, direction: &Direction) -> Point {
         match direction {
-            Direction::NorthWest => Point { x: self.x - 1, y: self.y - 1 },
-            Direction::North => Point { x: self.x, y: self.y - 1 },
-            Direction::NorthEast => Point { x: self.x + 1, y: self.y - 1 },
-            Direction::West => Point { x: self.x - 1, y: self.y },
-            Direction::East => Point { x: self.x + 1, y: self.y },
-            Direction::SouthWest => Point { x: self.x - 1, y: self.y + 1 },
-            Direction::South => Point { x: self.x, y: self.y + 1 },
-            Direction::SouthEast => Point { x: self.x + 1, y: self.y + 1 },
+            Direction::NorthWest => Point {
+                x: self.x - 1,
+                y: self.y - 1,
+            },
+            Direction::North => Point {
+                x: self.x,
+                y: self.y - 1,
+            },
+            Direction::NorthEast => Point {
+                x: self.x + 1,
+                y: self.y - 1,
+            },
+            Direction::West => Point {
+                x: self.x - 1,
+                y: self.y,
+            },
+            Direction::East => Point {
+                x: self.x + 1,
+                y: self.y,
+            },
+            Direction::SouthWest => Point {
+                x: self.x - 1,
+                y: self.y + 1,
+            },
+            Direction::South => Point {
+                x: self.x,
+                y: self.y + 1,
+            },
+            Direction::SouthEast => Point {
+                x: self.x + 1,
+                y: self.y + 1,
+            },
         }
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct WordSearch { 
+pub struct WordSearch {
     pub grid: Vec<Vec<char>>,
     pub bank: Vec<Vec<char>>,
     pub width: usize,
@@ -133,7 +180,7 @@ impl WordSearch {
                 let start = Point { x, y };
 
                 for direction in Direction::iter() {
-                    let mut cpath= vec![self.grid[start.x][start.y]];
+                    let mut cpath = vec![self.grid[start.x][start.y]];
                     let mut current = start.clone();
                     let mut ppath = vec![start.clone()];
 
@@ -148,8 +195,9 @@ impl WordSearch {
                             found.push(Word::new(
                                 cpath.iter().collect::<String>(),
                                 ppath.clone(),
+                                direction,
                             ));
-                        } 
+                        }
                     }
                 }
             }
