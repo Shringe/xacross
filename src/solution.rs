@@ -41,8 +41,21 @@ impl Solution {
         let mut entries = self.found.iter().map(|w| {
             let padding_width = longest_word_length - w.string.len();
             let padding = " ".repeat(padding_width);
-            let points = w.points.iter().join(", ");
-            format!("{}:{}{}", w.string.color(w.color), padding, points.yellow())
+
+            let first = w
+                .points
+                .first()
+                .expect("Tried to render a word, but there are no points");
+            let last = w.points.last().unwrap();
+
+            format!(
+                "{}:{}{} {} {}",
+                w.string.color(w.color),
+                padding,
+                first,
+                w.direction,
+                last
+            )
         });
 
         entries.join("\n")
