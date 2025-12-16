@@ -1,7 +1,6 @@
 use owo_colors::Rgb;
 use rand::Rng;
 use std::fmt;
-use std::fmt::write;
 use strum::EnumIter;
 use strum::IntoEnumIterator;
 

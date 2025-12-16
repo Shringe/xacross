@@ -104,8 +104,8 @@ impl Solution {
 
         // Adding the gaps and final formatting
         let mut rendered_grid = Vec::new();
-        // let column_gap = self.wordsearch.width.to_string().len() + 1;
-        let column_gap = 2;
+        let column_gap = self.wordsearch.width.to_string().len() + 1;
+        // let column_gap = 2;
         let column_seperator = " ".repeat(column_gap);
         for row in grid_render.iter() {
             let row = row.iter().join(&column_seperator);
@@ -117,11 +117,33 @@ impl Solution {
 
     /// Adds coordinate guides to the grid render
     fn add_guides(&self, grid: String) -> String {
-        let mut rows = Vec::new();
-        let num_digits = self.wordsearch.height.to_string().len();
+        let mut rows = Vec::with_capacity(self.wordsearch.height + 1);
+
+        let horizontal_digits = self.wordsearch.width.to_string().len();
+        let vertical_digits = self.wordsearch.height.to_string().len();
+        let horizontal_spacer = " |";
+        let top_guide_spacer = " ".repeat(horizontal_digits);
+
+        let final_width = horizontal_digits
+            + horizontal_spacer.len()
+            + (horizontal_digits + 2) * (self.wordsearch.width - 1)
+            + 1;
+
+        let mut top_guide = String::with_capacity(final_width - 1 + horizontal_digits);
+        top_guide.push_str(
+            " ".repeat(horizontal_digits + horizontal_spacer.len())
+                .as_str(),
+        );
+
+        for index in 0..self.wordsearch.width {
+            top_guide
+                .push_str(format!("{:0horizontal_digits$}{}", index, top_guide_spacer).as_str());
+        }
+
+        rows.push(top_guide);
 
         for (index, row) in grid.lines().enumerate() {
-            let new_row = format!("{:0num_digits$} |{}", index, row);
+            let new_row = format!("{:0vertical_digits$}{}{}", index, horizontal_spacer, row);
             rows.push(new_row);
         }
 
