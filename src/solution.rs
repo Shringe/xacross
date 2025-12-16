@@ -20,9 +20,24 @@ impl Solution {
 
     /// Renders the word bank
     fn render_bank(&self) -> String {
-        format!("{}",
-            self.found.iter().map(|w| format!("{}: {}", w.string.green(), w.points.iter().join(", ").yellow())).join("\n")
-        )
+        let mut longest_word_length = 0; 
+        for w in self.found.iter() {
+            let len = w.string.len();
+            if len > longest_word_length {
+                longest_word_length = len;
+            }
+        }
+
+        let longest_word_length  = longest_word_length + 2;
+
+        let mut entries = self.found.iter().map(|w| {
+            let padding_width = longest_word_length - w.string.len();
+            let padding = " ".repeat(padding_width);
+            let points = w.points.iter().join(", ");
+            format!("{}:{}{}", w.string.green(), padding, points.yellow())
+        });
+
+        entries.join("\n")
     }
 
     /// Renders the grid of characters
