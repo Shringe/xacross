@@ -46,7 +46,7 @@ impl Solution {
             let padding_width = longest_word_length - w.string.len();
             let padding = " ".repeat(padding_width);
             let points = w.points.iter().join(", ");
-            format!("{}:{}{}", w.string.green(), padding, points.yellow())
+            format!("{}:{}{}", w.string.color(w.color), padding, points.yellow())
         });
 
         entries.join("\n")

@@ -1,4 +1,3 @@
-use owo_colors::DynColors;
 use owo_colors::Rgb;
 use rand::Rng;
 use strum::IntoEnumIterator;
