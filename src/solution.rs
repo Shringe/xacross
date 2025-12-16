@@ -103,7 +103,7 @@ impl Solution {
         }
 
         // Adding the gaps and final formatting
-        let mut rendered_grid = Vec::new();
+        let mut rendered_grid = Vec::with_capacity(grid_render.len());
         let column_gap = self.wordsearch.width.to_string().len() + 1;
         // let column_gap = 2;
         let column_seperator = " ".repeat(column_gap);
