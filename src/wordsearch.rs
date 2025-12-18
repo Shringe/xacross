@@ -29,7 +29,7 @@ impl Word {
 
     /// Determines the color of the word based on its string
     fn determine_color(string: &str) -> Rgb {
-        let hasher = ColorHash::new();
+        let hasher = ColorHash::new().saturation(80.0).lightness(50.0);
         let rgb = hasher.rgb(string);
         Rgb(rgb.red() as u8, rgb.green() as u8, rgb.blue() as u8)
     }
