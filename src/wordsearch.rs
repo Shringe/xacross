@@ -16,14 +16,46 @@ pub struct Word {
 }
 
 impl Word {
-    pub fn new(string: String, points: Vec<Point>, direction: Direction) -> Self {
+    pub fn new(string: String, points: Vec<Point>) -> Self {
         let color = Self::determine_color(&string);
+        let direction = Self::determine_direction(&points);
 
         Self {
             string,
             points,
             color,
             direction,
+        }
+    }
+
+    /// Determines the direction that the word is crossed based on the points
+    fn determine_direction(points: &Vec<Point>) -> Direction {
+        let first = &points[0];
+        let second = &points[1];
+
+        let is_north = first.x > second.x;
+        let is_south = first.x < second.x;
+        let is_west = first.y > second.y;
+        let is_east = first.y < second.y;
+
+        if is_north && is_east {
+            Direction::NorthEast
+        } else if is_north && is_west {
+            Direction::NorthWest
+        } else if is_south && is_east {
+            Direction::SouthEast
+        } else if is_south && is_west {
+            Direction::SouthWest
+        } else if is_north {
+            Direction::North
+        } else if is_south {
+            Direction::South
+        } else if is_east {
+            Direction::East
+        } else if is_west {
+            Direction::West
+        } else {
+            unreachable!("Unknown direction")
         }
     }
 
@@ -194,11 +226,7 @@ impl WordSearch {
 
                         // Check if we found a word
                         if self.bank.contains(&cpath) {
-                            found.push(Word::new(
-                                cpath.iter().collect::<String>(),
-                                ppath.clone(),
-                                direction,
-                            ));
+                            found.push(Word::new(cpath.iter().collect::<String>(), ppath.clone()));
                         }
                     }
                 }
