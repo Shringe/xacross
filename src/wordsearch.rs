@@ -1,6 +1,7 @@
+use colorhash::ColorHash;
 use owo_colors::Rgb;
-use rand::Rng;
 use std::fmt;
+use std::hash::Hash;
 use strum::EnumIter;
 use strum::IntoEnumIterator;
 
@@ -28,12 +29,9 @@ impl Word {
 
     /// Determines the color of the word based on its string
     fn determine_color(string: &str) -> Rgb {
-        let mut rng = rand::rng();
-        Rgb(
-            rng.random_range(0..=255),
-            rng.random_range(0..=255),
-            rng.random_range(0..=255),
-        )
+        let hasher = ColorHash::new();
+        let rgb = hasher.rgb(string);
+        Rgb(rgb.red() as u8, rgb.green() as u8, rgb.blue() as u8)
     }
 }
 
