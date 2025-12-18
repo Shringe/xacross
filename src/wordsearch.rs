@@ -16,12 +16,7 @@ pub struct Word {
 
 impl Word {
     pub fn new(string: String, points: Vec<Point>, direction: Direction) -> Self {
-        let mut rng = rand::rng();
-        let color = Rgb(
-            rng.random_range(0..=255),
-            rng.random_range(0..=255),
-            rng.random_range(0..=255),
-        );
+        let color = Self::determine_color(&string);
 
         Self {
             string,
@@ -29,6 +24,16 @@ impl Word {
             color,
             direction,
         }
+    }
+
+    /// Determines the color of the word based on its string
+    fn determine_color(string: &str) -> Rgb {
+        let mut rng = rand::rng();
+        Rgb(
+            rng.random_range(0..=255),
+            rng.random_range(0..=255),
+            rng.random_range(0..=255),
+        )
     }
 }
 
