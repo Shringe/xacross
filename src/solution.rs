@@ -18,12 +18,34 @@ fn blend_colors(a: Rgb, b: Rgb) -> Rgb {
 pub struct Solution {
     wordsearch: WordSearch,
     found: Vec<Word>,
+
+    horizontal_digits: usize,
+    horizontal_spacer: &'static str,
+    vertical_digits: usize,
+    final_grid_width: usize,
 }
 
 impl Solution {
     pub fn new(wordsearch: WordSearch, mut found: Vec<Word>) -> Self {
         found.sort_by(|a, b| a.string.cmp(&b.string));
-        Self { wordsearch, found }
+
+        let horizontal_digits = wordsearch.width.to_string().len();
+        let vertical_digits = wordsearch.height.to_string().len();
+        let horizontal_spacer = " |";
+
+        let final_grid_width = horizontal_digits
+            + horizontal_spacer.len()
+            + (horizontal_digits + 2) * (wordsearch.width - 1)
+            + 1;
+
+        Self {
+            wordsearch,
+            found,
+            horizontal_digits,
+            horizontal_spacer,
+            vertical_digits,
+            final_grid_width,
+        }
     }
 
     /// Renders the word bank
@@ -119,31 +141,27 @@ impl Solution {
     fn add_guides(&self, grid: String) -> String {
         let mut rows = Vec::with_capacity(self.wordsearch.height + 1);
 
-        let horizontal_digits = self.wordsearch.width.to_string().len();
-        let vertical_digits = self.wordsearch.height.to_string().len();
-        let horizontal_spacer = " |";
-        let top_guide_spacer = " ".repeat(horizontal_digits);
-
-        let final_width = horizontal_digits
-            + horizontal_spacer.len()
-            + (horizontal_digits + 2) * (self.wordsearch.width - 1)
-            + 1;
-
-        let mut top_guide = String::with_capacity(final_width - 1 + horizontal_digits);
+        let mut top_guide =
+            String::with_capacity(self.final_grid_width - 1 + self.horizontal_digits);
         top_guide.push_str(
-            " ".repeat(horizontal_digits + horizontal_spacer.len())
+            " ".repeat(self.horizontal_digits + self.horizontal_spacer.len())
                 .as_str(),
         );
 
+        let top_guide_spacer = " ".repeat(self.horizontal_digits);
         for index in 0..self.wordsearch.width {
-            top_guide
-                .push_str(format!("{:0horizontal_digits$}{}", index, top_guide_spacer).as_str());
+            top_guide.push_str(
+                format!("{:02$}{}", index, top_guide_spacer, self.horizontal_digits).as_str(),
+            );
         }
 
         rows.push(top_guide);
 
         for (index, row) in grid.lines().enumerate() {
-            let new_row = format!("{:0vertical_digits$}{}{}", index, horizontal_spacer, row);
+            let new_row = format!(
+                "{:3$}{}{}",
+                index, self.horizontal_spacer, row, self.vertical_digits
+            );
             rows.push(new_row);
         }
 
@@ -151,28 +169,29 @@ impl Solution {
     }
 
     /// Formats a simple divider used for the final solution display
-    fn format_divider(title: &str) -> String {
-        // TODO: extrapolate some of the math from the top spacer into Self, so that the
-        // final_width can be reused to compute trailing len
+    fn format_divider(&self, title: &str) -> String {
         let spacer = ": ";
-        let trailing = "=".repeat(50);
-        format!("{}{}{}", title, spacer, trailing)
+        let mut out = String::with_capacity(self.final_grid_width);
+        out.push_str(title);
+        out.push_str(spacer);
+        out.push_str("=".repeat(self.final_grid_width - out.len()).as_str());
+        out
     }
 
     /// Formats a final solution screen from a rendered bank and grid
-    fn format_render(grid: String, bank: String) -> String {
+    fn format_render(&self, grid: String, bank: String) -> String {
         format!(
             "{}\n{}\n\n{}\n{}",
-            Self::format_divider("Wordsearch"),
+            self.format_divider("Wordsearch"),
             grid,
-            Self::format_divider("Bank"),
+            self.format_divider("Bank"),
             bank
         )
     }
 
     /// Renders a bank and grid, and then formats them to be displayed
     pub fn render(&self) -> String {
-        Self::format_render(
+        self.format_render(
             Self::add_guides(&self, self.render_grid()),
             self.render_bank(),
         )
