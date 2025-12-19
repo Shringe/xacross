@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use itertools::Itertools;
 use owo_colors::{OwoColorize, Rgb};
 
-use crate::wordsearch::{Word, WordSearch};
+use crate::wordsearch::{Point, Word, WordSearch};
 
 /// Blends two rgb colors together
 fn blend_colors(a: Rgb, b: Rgb) -> Rgb {
@@ -48,6 +48,11 @@ impl Solution {
         }
     }
 
+    /// Renders a point for display
+    fn render_point(&self, point: &Point) -> String {
+        format!("({:02$}, {:02$})", point.y, point.x, self.horizontal_digits)
+    }
+
     /// Renders the word bank
     fn render_bank(&self) -> String {
         let mut longest_word_length = 0;
@@ -74,9 +79,9 @@ impl Solution {
                 "{}:{}{} {} {}",
                 w.string.color(w.color),
                 padding,
-                first,
+                self.render_point(first),
                 w.direction,
-                last
+                self.render_point(last)
             )
         });
 
